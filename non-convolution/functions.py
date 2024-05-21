@@ -2,27 +2,6 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-# Load the data
-data = pd.read_csv('dataset/train.csv')
-
-# Reorder the data
-data = np.array(data)
-m, n = data.shape
-np.random.shuffle(data)
-
-# Split the data
-data_dev = data[0:1000].T
-Y_dev = data_dev[0]
-X_dev = data_dev[1:n]
-X_dev = X_dev / 255.
-
-data_train = data[1000:m].T
-Y_train = data_train[0]
-X_train = data_train[1:n]
-X_train = X_train / 255.
-
-_, m_train = X_train.shape
-
 def relU(Z):
     return np.maximum(Z, 0)
 
@@ -45,10 +24,10 @@ def make_predictions(X, W1, b1, W2, b2):
     predictions = get_predictions(A2)
     return predictions
 
-def test_prediction(index, W1, b1, W2, b2):
-    current_image = X_train[:, index, None]
-    prediction = make_predictions(X_train[:, index, None], W1, b1, W2, b2)
-    label = Y_train[index]
+def test_prediction(index, W1, b1, W2, b2, X, Y):
+    current_image = X[:, index, None]
+    prediction = make_predictions(X[:, index, None], W1, b1, W2, b2)
+    label = Y[index]
     print("Prediction: ", prediction)
     print("Label: ", label)
 
@@ -58,10 +37,10 @@ def test_prediction(index, W1, b1, W2, b2):
     plt.show()
 
 def initialize_parameters():
-    W1 = np.random.rand(10, 784) - 0.5
-    b1 = np.random.rand(10, 1) - 0.5
-    W2 = np.random.rand(10, 10) - 0.5
-    b2 = np.random.rand(10, 1) - 0.5
+    W1 = np.random.normal(size=(10, 784)) * np.sqrt(1./(784))
+    b1 = np.random.normal(size=(10, 1)) * np.sqrt(1./10)
+    W2 = np.random.normal(size=(10, 10)) * np.sqrt(1./20)
+    b2 = np.random.normal(size=(10, 1)) * np.sqrt(1./(784))
     return W1, b1, W2, b2
 
 
@@ -74,13 +53,13 @@ def forward_propagation(X, W1, b1, W2, b2):
     return Z1, A1, Z2, A2
 
 # Backward propagation
-def backward_propagation(X, Y, Z1, A1, Z2, A2, W1, W2):
+def backward_propagation(X, Y, Z1, A1, Z2, A2, W1, W2, m_var):
     dZ2 = A2 - one_hot(Y)
-    dW2 = 1/m * dZ2.dot(A1.T)
-    dB2 = 1/m * np.sum(dZ2)
+    dW2 = 1/m_var * dZ2.dot(A1.T)
+    dB2 = 1/m_var * np.sum(dZ2)
     dZ1 = W2.T.dot(dZ2) * relU_prime(Z1)
-    dW1 = 1/m * dZ1.dot(X.T)
-    dB1 = 1/m * np.sum(dZ1)
+    dW1 = 1/m_var * dZ1.dot(X.T)
+    dB1 = 1/m_var * np.sum(dZ1)
     return dW1, dB1, dW2, dB2
 
 # Update the weights
@@ -98,23 +77,14 @@ def one_hot(Y):
     return one_hot_Y
 
 # Gradient descent
-def gradient_descent(X,Y,alpha,iterations):
+def gradient_descent(X,Y,alpha,iterations,m_var):
     W1, b1, W2, b2 = initialize_parameters()
     for i in range(iterations):
         Z1, A1, Z2, A2 = forward_propagation(X, W1, b1, W2, b2)
-        dW1, dB1, dW2, dB2 = backward_propagation(X, Y, Z1, A1, Z2, A2, W1, W2)
+        dW1, dB1, dW2, dB2 = backward_propagation(X, Y, Z1, A1, Z2, A2, W1, W2, m_var)
         W1, W2, b1, b2 = update_weights(W1, W2, b1, b2, dW1, dB1, dW2, dB2, alpha)
         if i % 10 == 0:
             print("Iteration: ", i)
             predictions = get_predictions(A2)
             print(get_accuracy(predictions, Y))
     return W1, W2, b1, b2
-
-# Train the model
-W1, W2, b1, b2 = gradient_descent(X_train, Y_train, 0.10, 500)
-test_prediction(0, W1, b1, W2, b2)
-
-
-
-
-
