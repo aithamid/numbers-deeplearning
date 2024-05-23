@@ -5,6 +5,11 @@ import { Dotting, type DottingRef, useDotting, type PixelModifyItem, useData } f
 import { CircleHelp, Eraser } from "lucide-react";
 import { useRef, useState } from "react";
 
+type ApiData = {
+  guess: number,
+  confidence: number
+}
+
 export default function Home() {
   const zeros : number[] = Array(784).fill(0);
   const [data, setData] = useState<number[]>(zeros);
@@ -37,6 +42,21 @@ export default function Home() {
         dataFloat.push(dataArray[i][j].color === "#FFF" ? 1 : 0);
       }
     }
+
+    // send data to the server
+    // the date is : {image : [array of 784 floats]}
+    fetch("http://localhost:8000/predict/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({image: dataFloat})
+    }).then(response => response.json())
+    .then((data: ApiData) => {
+      setGuess(data.guess);
+      setConfidence(data.confidence);
+    })
+
     setData(dataFloat);
     console.log(dataFloat);
   }

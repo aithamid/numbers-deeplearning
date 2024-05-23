@@ -17,7 +17,7 @@ def get_accuracy(predictions, Y):
     return np.sum(predictions == Y) / Y.size
 
 def get_predictions(A2):
-    return np.argmax(A2, 0)
+    return np.argmax(A2, 0), np.max(A2)
 
 def make_predictions(X, W1, b1, W2, b2):
     _, _, _, A2 = forward_propagation(X, W1, b1, W2, b2)
