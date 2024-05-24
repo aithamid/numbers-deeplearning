@@ -1,0 +1,17 @@
+services:
+  api:
+    image: api
+    build: 
+      dockerfile: ./Dockerfile.api
+    ports:
+      - "8000:8000"
+  app:
+    image: app
+    build: 
+      dockerfile: ./Dockerfile.app
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+
+  

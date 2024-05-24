@@ -19,6 +19,7 @@ export default function Home() {
   const [confidence_nn, setConfidenceNN] = useState<number>(0.0);
   const ref = useRef<DottingRef>(null);
   const { clear } = useDotting(ref);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const CreateEmptySquareData = (
     size: number,
@@ -54,7 +55,7 @@ export default function Home() {
   }
 
   function CNN_predict(data: number[]) {
-    fetch("http://localhost:8000/predict_cnn/", {
+    fetch("https://api.mnist.heurly.fr/predict_cnn/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -68,7 +69,7 @@ export default function Home() {
   }
 
   function NN_predict(data: number[]) {
-    fetch("http://localhost:8000/predict/", {
+    fetch("https://api.mnist.heurly.fr/predict/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -85,8 +86,10 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-10">
       <div className="flex flex-col items-center space-y-3">
       <h1 className="text-3xl font-bold">MNIST Classifier - Guess the number</h1>
+      {/* By Adam and Raphaël */}
+      <p className="">By Adam and Raphaël</p>
       <p>Draw a number between 0 and 9</p>
-        <Dotting width={500} ref={ref} height={500} brushColor="#FFF" defaultPixelColor="#000000" gridStrokeColor="#AAA" isGridFixed gridSquareLength={100} initLayers={[
+        <Dotting width={400} ref={ref} height={400} brushColor="#FFF" defaultPixelColor="#000000" gridStrokeColor="#AAA" isGridFixed gridSquareLength={100} initLayers={[
         {
           id: "default",
           data: CreateEmptySquareData(28),
@@ -97,7 +100,9 @@ export default function Home() {
           <Eraser />
           <p> Clear</p>
         </Button>
-        <Button type="button" onClick={displayData} className="space-x-1">
+        <Button type="button" onClick={displayData} className="space-x-1" disabled={
+          dataArray.every(row => row.every(pixel => pixel.color === ""))
+        }>
           <CircleHelp />
           <p>Guess</p>
         </Button>
