@@ -13,8 +13,10 @@ type ApiData = {
 export default function Home() {
   const zeros : number[] = Array(784).fill(0);
   const [data, setData] = useState<number[]>(zeros);
-  const [guess, setGuess] = useState<number>(-1);
-  const [confidence, setConfidence] = useState<number>(0.0);
+  const [guess_cnn, setGuessCNN] = useState<number>(-1);
+  const [guess_nn, setGuessNN] = useState<number>(-1);
+  const [confidence_cnn, setConfidenceCNN] = useState<number>(0.0);
+  const [confidence_nn, setConfidenceNN] = useState<number>(0.0);
   const ref = useRef<DottingRef>(null);
   const { clear } = useDotting(ref);
 
@@ -42,23 +44,41 @@ export default function Home() {
         dataFloat.push(dataArray[i][j].color === "#FFF" ? 1 : 0);
       }
     }
+    setData(dataFloat);
+    console.log(dataFloat);
 
-    // send data to the server
-    // the date is : {image : [array of 784 floats]}
+    // predict using CNN
+    CNN_predict(dataFloat);
+    // predict using NN
+    NN_predict(dataFloat);
+  }
+
+  function CNN_predict(data: number[]) {
+    fetch("http://localhost:8000/predict_cnn/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({image: data})
+    }).then(response => response.json())
+    .then((data: ApiData) => {
+      setGuessCNN(data.guess);
+      setConfidenceCNN(data.confidence);
+    })
+  }
+
+  function NN_predict(data: number[]) {
     fetch("http://localhost:8000/predict/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({image: dataFloat})
+      body: JSON.stringify({image: data})
     }).then(response => response.json())
     .then((data: ApiData) => {
-      setGuess(data.guess);
-      setConfidence(data.confidence);
+      setGuessNN(data.guess);
+      setConfidenceNN(data.confidence);
     })
-
-    setData(dataFloat);
-    console.log(dataFloat);
   }
   
   return (
@@ -85,10 +105,19 @@ export default function Home() {
 
         
       </div>
-      <div className="flex flex-col items-center">
-        <h2 className="text-2xl font-bold">Result</h2>
-        <p>Guess: {guess}</p>
-        <p>Confidence: {confidence}</p>
+      
+      {/* display two results besides each other */}
+      <div className="flex flex-row items-center space-x-5">
+        <div className="flex flex-col items-center space-y-3">
+          <h2 className="text-2xl font-bold">CNN Prediction</h2>
+          <p>Guess: {guess_cnn}</p>
+          <p>Confidence: {(confidence_cnn * 100).toFixed(2)} %</p>
+        </div>
+        <div className="flex flex-col items-center space-y-3">
+          <h2 className="text-2xl font-bold">NN Prediction</h2>
+          <p>Guess: {guess_nn}</p>
+          <p>Confidence: {(confidence_nn * 100).toFixed(2)} %</p>
+        </div>
       </div>
 
     </main>
