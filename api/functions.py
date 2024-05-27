@@ -21,7 +21,7 @@ def get_predictions(A2):
 
 def make_predictions(X, W1, b1, W2, b2):
     _, _, _, A2 = forward_propagation(X, W1, b1, W2, b2)
-    predictions = get_predictions(A2)
+    predictions, confidence = get_predictions(A2)
     return predictions
 
 def test_prediction(index, W1, b1, W2, b2, X, Y):
@@ -85,6 +85,6 @@ def gradient_descent(X,Y,alpha,iterations,m_var):
         W1, W2, b1, b2 = update_weights(W1, W2, b1, b2, dW1, dB1, dW2, dB2, alpha)
         if i % 10 == 0:
             print("Iteration: ", i)
-            predictions = get_predictions(A2)
+            predictions, confidence = get_predictions(A2)
             print(get_accuracy(predictions, Y))
     return W1, W2, b1, b2

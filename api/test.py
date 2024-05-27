@@ -43,8 +43,9 @@ print(X_dev[:, 0, None].shape)
 
 # print("next")
 
-# dev_predictions = make_predictions(X_dev, W1, b1, W2, b2)
-# print(dev_predictions)
+dev_predictions = make_predictions(X_dev, W1, b1, W2, b2)
+print(dev_predictions)
 
-# print("next")
-# print(get_accuracy(dev_predictions, Y_dev))
+print("next")
+prediction = get_accuracy(dev_predictions, Y_dev)
+print(prediction)
