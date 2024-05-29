@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from functions import make_predictions, get_accuracy
 
 # Load the data
-data = pd.read_csv('../dataset/train.csv')
+data = pd.read_csv('../../dataset/train.csv')
 
 # Reorder the data
 data = np.array(data)

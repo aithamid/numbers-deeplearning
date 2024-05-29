@@ -1,7 +1,7 @@
 from typing import List, Union
 from fastapi import FastAPI, Query, Body
 from pydantic import BaseModel
-from functions import forward_propagation, get_predictions
+from nn.functions import forward_propagation, get_predictions
 import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
 import tensorflow as tf
@@ -9,13 +9,13 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 
-model = np.load('model.npz')
+model = np.load('nn/model.npz')
 W1 = model['W1']
 W2 = model['W2']
 b1 = model['b1']
 b2 = model['b2']
 
-model_cnn = keras.models.load_model('digit_recognizer.h5')
+model_cnn = keras.models.load_model('cnn/digit_recognizer.h5')
 
 app = FastAPI()
 
